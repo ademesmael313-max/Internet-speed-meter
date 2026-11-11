@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Pulse NetMeter</string>
+    <string name="notification_channel_name">Live Speed Meter</string>
+    <string name="notification_channel_desc">Displays real-time status-bar internet speed and session data usage</string>
+</resources>

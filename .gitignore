@@ -1,8 +1,26 @@
-node_modules/
-dist/
-data/
+# Web & Node (root-anchored so Kotlin package paths like .../data/ are never ignored)
+/node_modules/
+/dist/
+/data/
+/.playwright-cli/
+
+# Android Studio & Gradle
+/.gradle/
+/local.properties
+/.idea/
+*.iml
+/build/
+/app/build/
+/captures/
+/.externalNativeBuild/
+/.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# System & Env
 .DS_Store
 *.log
 .env
 .env.*
-.playwright-cli/
