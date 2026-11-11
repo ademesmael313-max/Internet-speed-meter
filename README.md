@@ -1,49 +1,41 @@
-# PULSE // NET-METER
+# PULSE // NET-METER (Android App + Full-Stack Web Suite)
 
-A full-stack **Internet Speed Meter, Live Bandwidth Monitor, and Bufferbloat Telemetry Suite** built with React, TypeScript, Tailwind CSS, and an Express high-entropy binary streaming backend.
+**PULSE // NET-METER** includes both a **Native Android Studio App (Kotlin + Jetpack Compose)** that compiles into an installable **Android `.apk`** and a **Full-Stack Web Speed & Telemetry Suite**.
 
-## Features
+---
 
-- **Multi-Stream Full-Duplex Speed Test**
-  - Configurable parallel streams (`1x`, `2x`, `4x`, `8x`), test duration (`4s`–`15s`), server node profiles, and optional rate-cap shaping (`10`–`250 Mbps` or `Unthrottled`).
-  - Uses incompressible random binary payloads (`application/octet-stream` with `Cache-Control: no-store, no-transform`) so transparent proxy compression never inflates bandwidth readings.
-  - Real socket-level upload progress tracking (`XMLHttpRequest.upload.onprogress`) and streaming `ReadableStream` download workers.
-- **Bufferbloat & Loaded Latency Grading (`A`–`F`)**
-  - Measures idle latency, RFC-3550 jitter, packet loss, and concurrent loaded latency during both download and upload saturation.
-- **Continuous Live Speed & Latency Meter**
-  - Real-time scrolling dual-trace graph with two operating modes:
-    - **DL + UL + Ping**: periodic active bandwidth & latency micro-bursts with session data counter.
-    - **Zero-Data Ping**: ultra-lightweight latency heartbeat monitor for spotting micro-dropouts and lag spikes.
-- **Connection Readiness & Transfer Time Estimator**
-  - Evaluates readiness for 4K HDR streaming, competitive online gaming, HD video calls, and cloud backups, alongside real-world download/upload time estimates (`250 MB` to `80 GB`).
-- **Persistent History & Exports**
-  - Saves test runs to server storage (`data/speedtest-history.json`) and browser `localStorage`, with expandable throughput curves, **CSV export**, **JSON export**, and one-click shareable text reports.
-- **Network Diagnostics & 20-Packet Ping Sweep**
-  - Displays endpoint IP, HTTP/TLS transport details, browser radio hints, node specs, and an interactive 20-packet tail-latency (`min` / `median` / `avg` / `p95` / `jitter`) histogram.
+## 1. Native Android App (`app/` — Android Studio & `.apk`)
 
-## Quick Start
+Built with **Kotlin 2.0**, **Jetpack Compose (Material 3)**, **OkHttp**, and Android OS **TrafficStats** (`minSdk = 26`, `targetSdk = 35`).
+
+### Android Features
+- **Live Status-Bar & Notification Speed Meter (`SpeedMeterService`)**:
+  - Samples device-wide network throughput across all apps every second via `android.net.TrafficStats`.
+  - Renders a live 2-line speed indicator (`KB/s` & `MB/s`) directly inside the **Android status bar** and lock-screen notification, with a one-tap **Stop Meter** action and optional **Auto-start on boot** (`BootReceiver`).
+- **7-Day Wi-Fi vs. Mobile Data Usage Ledger**:
+  - Tracks session, daily, and 7-day Wi-Fi vs. cellular byte consumption locally on device.
+- **Standalone Multi-Stream Speed Test (`SpeedTestEngine`)**:
+  - Works out-of-the-box against **Cloudflare Global Edge** (`speed.cloudflare.com`) or any custom `PULSE // NET-METER` server URL.
+  - Measures unloaded ping, RFC-3550 jitter, packet loss, multi-stream download/upload (`1x`–`8x`), loaded latency, and **Bufferbloat Grade (`A`–`F`)** with an animated radial Compose gauge.
+- **Android Radio Diagnostics & 20-Packet Sweep**:
+  - Inspects `ConnectivityManager`, `NetworkCapabilities`, and `LinkProperties` (Wi-Fi/Cellular/VPN transport, `wlan0`/`rmnet` interface, local IPs, DNS resolvers, link capacity, public IP/ISP) plus a 20-packet latency histogram.
+
+### Build `.apk` in Android Studio or CLI
+1. **Android Studio**: Open this repository root folder in Android Studio (Ladybug / Meerkat or newer with JDK 17), wait for Gradle sync, and select **Build → Build Bundle(s) / APK(s) → Build APK(s)** (or press **Run** on a connected phone/emulator).
+2. **Command Line**:
+   ```bash
+   ./gradlew assembleDebug
+   # Output APK: app/build/outputs/apk/debug/app-debug.apk
+   ```
+3. **GitHub Actions Automated APK**: Every push / PR runs `.github/workflows/android-apk.yml` and publishes `pulse-netmeter-debug-apk` (`app-debug.apk`) in the GitHub Actions run artifacts.
+
+---
+
+## 2. Web Application (`src/` + `server/`)
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server (Express API + Vite frontend on 0.0.0.0:3000)
-npm run dev
-
-# Run unit & API integration tests
-npm test
-
-# Production build & start
-npm run build
-npm start
+npm run dev      # Starts Express binary streaming server + Vite UI on 0.0.0.0:3000
+npm test         # Runs Vitest unit & server integration tests
+npm run build    # Builds production web bundle
 ```
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `GET` | `/api/speedtest/ping` | Sub-millisecond latency & jitter probe |
-| `GET` | `/api/speedtest/download?bytes=...&throttleMbps=...` | High-entropy incompressible binary download stream |
-| `POST` | `/api/speedtest/upload` | Non-buffering upload sink returning `bytesReceived` & `durationMs` |
-| `GET` | `/api/network-info` | Client IP, protocol, headers, and measurement node metadata |
-| `GET/POST/DELETE` | `/api/history` | Persistent speed test history CRUD |
